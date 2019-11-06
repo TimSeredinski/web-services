@@ -1,0 +1,30 @@
+create type public.features AS enum ('POOL', 'BAR', 'GYM');
+create type public.tour_type AS enum ('SIGHTSEEING', 'SHORE_EXCURSION', 'ADVEMTURE_OR_SPORTING');
+create table user_account(id serial  not null primary key, login varchar(50) not null unique, password varchar(255) not null);
+create table roles(id serial not null primary key, name varchar (50) not null unique);
+create table country(id serial not null primary key, name varchar(50) not null);
+create table hotel(id serial not null primary key, name varchar(50) not null, stars integer, website text, lalitude numeric(30,0), longitude numeric(30,0), features features[]);
+create table tour(id serial not null primary key, photo text, date date, duration integer, description text, cost integer, tour_type tour_type, hotel_id integer, country_id integer);
+create table review(id serial not null primary key, date date, text text, user_id integer, tour_id integer);
+create table user_tour(user_id integer, tour_id integer);
+create table user_roles(user_id integer, role_id integer);
+
+ALTER TABLE public.user_roles ADD CONSTRAINT fk10xshnvsvc4prd1ldgoh0v8oa FOREIGN KEY (user_id) REFERENCES public.user_account (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.user_roles ADD CONSTRAINT fkh8ciramu9cc9q3qcqiv4ue8a6 FOREIGN KEY (role_id) REFERENCES public.roles (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.user_roles ADD CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role_id);
+ALTER TABLE public.user_tour ADD CONSTRAINT fkmrhqfcjocr4tu836mv5395vni FOREIGN KEY (user_id) REFERENCES public.tour (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.user_tour ADD CONSTRAINT fks3wngg46lm3co2fu01jl95xff FOREIGN KEY (tour_id) REFERENCES public.user_account (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.user_tour ADD CONSTRAINT user_tour_pkey PRIMARY KEY (tour_id, user_id);
+ALTER TABLE public.tour ADD CONSTRAINT fk3a397pqqftlfhr3g9ukiddyfn FOREIGN KEY (country_id) REFERENCES public.country (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.tour ADD CONSTRAINT fko8v5uv0ml4kcuw08pkm312v9o FOREIGN KEY (hotel_id) REFERENCES public.hotel (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.review ADD CONSTRAINT fk3fd39bskdmbgspkgex3rd6ytt FOREIGN KEY (tour_id) REFERENCES public.tour (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE public.review ADD CONSTRAINT fk61udu1kjvur2wip3jfpel5k2 FOREIGN KEY (user_id) REFERENCES public.user_account (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+insert into user_account (login, password) VALUES ('Nick', '$2a$10$m4g6el5WeMtw.XQXmHW7/OvbBkizk0SG9pmFGqpfyIS0AaPfkIPle'), ('John', '$2a$10$m4g6el5WeMtw.XQXmHW7/OvbBkizk0SG9pmFGqpfyIS0AaPfkIPle'), ('Jane', '$2a$10$m4g6el5WeMtw.XQXmHW7/OvbBkizk0SG9pmFGqpfyIS0AaPfkIPle');
+insert into roles (name) VALUES ('ROLE_ADMIN'), ('ROLE_MEMBER'), ('ROLE_GUEST');
+insert into country (name) VALUES ('Finland'), ('Japan'), ('Spain');
+insert into hotel (name, stars, website, lalitude, longitude, features) VALUES ('Aricanda', 5, 'aricanda.com', 65, 70, '{POOL, BAR}'), ('Tourist', 4, 'tourist.com', 30, 85, '{GYM, BAR}'), ('Tourist', 4, 'tourist.com', 30, 85, '{GYM, BAR}');
+insert into tour (photo, date, duration, description, cost, tour_type, hotel_id, country_id) values ('img/tour_1.png', '2019-05-15 13:29:12.11', 14, 'Some description for tour-1', 450, 'SIGHTSEEING', 1, 1), ('img/tour_2.png', '2019-05-15 13:19:30.706', 12, 'Description for tour-2', 300, 'SHORE_EXCURSION', 2, 2), ('img/tour_3.png', '2019-05-15 13:21:06.72', 7, 'Some description for tour-3', 345, 'ADVEMTURE_OR_SPORTING', 3, 3);
+insert into review (date, text, tour_id, user_id) values ('2019-05-15 13:29:12.11', 'Some review from user-1 to tour-1', 1, 1), ('2019-05-15 13:19:30.706', 'Some review from user-2 to tour-2', 2, 2), ('2019-05-15 13:21:06.72', 'Some review from user-3 to tour-3', 3, 3);
+insert into user_tour (user_id, tour_id) values (1,1), (2,2), (3,3);
+insert into user_roles (user_id, role_id) values (1,1), (2,2), (3,3);
